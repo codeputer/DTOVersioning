@@ -1,0 +1,16 @@
+@* A reusable component for displaying a JSON textarea, a button, and a result area *@
+<div>
+    <label for="@TextAreaId"><b>@Label</b></label><br />
+    <textarea id="@TextAreaId" rows="10" style="width:100%;" @bind="CustomerJson"></textarea>
+    <button class="btn btn-primary" @onclick="OnButtonClick">@ButtonLabel</button>
+    <div>@DeserializationResult</div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string ButtonLabel { get; set; } = "Deserialize";
+    [Parameter] public string? CustomerJson { get; set; }
+    [Parameter] public string? DeserializationResult { get; set; }
+    [Parameter] public EventCallback OnButtonClick { get; set; }
+    [Parameter] public string TextAreaId { get; set; } = Guid.NewGuid().ToString();
+}
