@@ -29,7 +29,7 @@ public class CustomerManager(IEnumerable<ICustomerEngine> customerEngines, ILogg
       throw new InvalidOperationException($"Customer engine not found for type {typeof(T).Name}");
     }
 
-    var resultEnumeration =  customerEngine.GetCustomer<T>(id) ?? throw new InvalidOperationException($"Customer not found for id {id}");
+    var resultEnumeration =  customerEngine.GetCustomer(id) ?? throw new InvalidOperationException($"Customer not found for id {id}");
 
     return JsonSerializer.Serialize(resultEnumeration, new JsonSerializerOptions
     {

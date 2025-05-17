@@ -1,5 +1,12 @@
 ﻿global using BlazorApp1.Client.Engines.Interfaces;
 global using System.Text.Json.Serialization;
-global using LateralDTOSample.ResourceAccess;
 global using BlazorApp1.Client.ResourceAccess;
 global using System.Text.Json;
+global using BlazorApp1.Client.Engines;
+global using Microsoft.AspNetCore.Components;
+global using BlazorApp1.Client.Managers;
+global using BlazorApp1.Client.Models;
+global using System.Linq.Expressions;
+global using System.Runtime.CompilerServices;
+global using BlazorApp1.Client.Utilities.String;
+global using BlazorApp1.Client.Utilities;

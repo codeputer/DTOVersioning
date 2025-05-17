@@ -4,5 +4,6 @@ public interface ICustomerEngine
 {
   Type CustomerType { get; }
 
-  IEnumerable<T> GetCustomer<T>(string id) where T : class, ICustomerDTO, new();
+  Result<IEnumerable<ICustomerDTO>> GetCustomer(string id);
+
 }

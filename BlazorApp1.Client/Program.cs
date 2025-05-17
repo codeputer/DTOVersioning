@@ -10,6 +10,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped<CustomerManager>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV1>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV2>();
+builder.Services.AddScoped<ICustomerEngine, CustomerEngineV3>();
 builder.Services.AddScoped<CustomerRA>();
 
 var blazorApp = builder.Build();

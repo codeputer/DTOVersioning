@@ -15,6 +15,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<CustomerManager>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV1>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV2>();
+builder.Services.AddScoped<ICustomerEngine, CustomerEngineV3>();
 builder.Services.AddScoped<CustomerRA>();
 
 var app = builder.Build();

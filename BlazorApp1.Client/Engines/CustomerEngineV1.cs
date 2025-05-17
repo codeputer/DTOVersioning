@@ -1,4 +1,9 @@
-﻿namespace BlazorApp1.Client.Engines;
+﻿using System.Collections.Generic;
+
+using BlazorApp1.Client.Models;
+using BlazorApp1.Client.Utilities;
+
+namespace BlazorApp1.Client.Engines;
 
 public class CustomerEngineV1(CustomerRA customerRA) : ICustomerEngine
 {
@@ -6,10 +11,9 @@ public class CustomerEngineV1(CustomerRA customerRA) : ICustomerEngine
 
   public Type CustomerType => typeof(CustomerV1);
 
-  public IEnumerable<T> GetCustomer<T>(string id) where T : class, ICustomerDTO, new()
+  public Result<IEnumerable<ICustomerDTO>> GetCustomer(string id)
   {
-    // Call the non-generic GetCustomer and cast results to T
-    return _CustomerRA.GetCustomer(typeof(T), id).OfType<T>();
+     return  _CustomerRA.GetCustomer<CustomerV1>(id);
   }
 }
 
