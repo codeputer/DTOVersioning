@@ -42,7 +42,7 @@ public partial class Customers : ComponentBase
   {
     try
     {
-      var customerV1Result = JsonSerializer.Deserialize<Result<List<CustomerV1>>>(_customerV1 ?? "", _JsonSerializeOptions);
+      var customerV1Result = ResultExtensions.DeserializeResult<List<CustomerV1>>(_customerV1!, typeof(IEnumerable<CustomerV2>));
       if (customerV1Result is null)
       {
         _customerV1Result = "Deserialization returned null.";

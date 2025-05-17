@@ -2,5 +2,5 @@
 
 public class CustomerV3 : CustomerV2
 {
-  public string Heritage { get; set; } = string.Empty;
+  public string Heritage { get; set; } = "Dutch";
 }

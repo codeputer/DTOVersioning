@@ -35,7 +35,7 @@ public class CustomerManager(IEnumerable<ICustomerEngine> customerEngines, ILogg
     {
       WriteIndented = true,
       PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-      DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+      DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     });
 
   }

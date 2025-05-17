@@ -13,15 +13,14 @@ public class CustomerRA
     {
       var _ when typeRequired == typeof(CustomerV1) => Result<IEnumerable<ICustomerDTO>>.Success(
                                                                 [
-                                                                  new CustomerV2
+                                                                  new CustomerV1
                                                                   {
                                                                     Id = id,
                                                                     FirstName = $"John_{id}",
                                                                     LastName = "Doe",
-                                                                    Email = $"John_{id}@Doe.ca",
-                                                                    Citizen = "Canada"
+                                                                    Email = $"John_{id}@Doe.ca"
                                                                   }
-                                                                ]),
+                                                                ], fullTypeName:typeof(IEnumerable<CustomerV1>).FullName),
 
       var _ when typeRequired == typeof(CustomerV2) => Result<IEnumerable<ICustomerDTO>>.Success(
                                                                 [
@@ -31,9 +30,10 @@ public class CustomerRA
                                                                     FirstName = $"John_{id}",
                                                                     LastName = "Doe",
                                                                     Email = $"John_{id}@Doe.ca",
+                                                                    Address = $"Raymer {id} Street",
                                                                     Citizen = "Canada"
                                                                   }
-                                                                ]),
+                                                                ], fullTypeName: typeof(IEnumerable<CustomerV2>).FullName),
 
       var _ when typeRequired == typeof(CustomerV3) => Result<IEnumerable<ICustomerDTO>>.Failure($"Customer Id:{id.ParamMarkers()} was not found"),
 
