@@ -4,6 +4,6 @@ public interface ICustomerEngine
 {
   Type CustomerType { get; }
 
-  Result<IEnumerable<ICustomerDTO>> GetCustomer(string id);
-
+  ICustomerDTO? GetCustomer(string id);
 }
+

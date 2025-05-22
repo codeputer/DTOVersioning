@@ -13,10 +13,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddScoped<CustomerManager>();
+builder.Services.AddScoped<ICustomerRA<ICustomerDTO>, CustomerRA_V1>();
+builder.Services.AddScoped<ICustomerRA<ICustomerDTO>, CustomerRA_V2>();
+builder.Services.AddScoped<ICustomerRA<ICustomerDTO>, CustomerRA_V3>();
+
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV1>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV2>();
 builder.Services.AddScoped<ICustomerEngine, CustomerEngineV3>();
-builder.Services.AddScoped<CustomerRA>();
+builder.Services.AddScoped<CustomerEngine>();
 
 var app = builder.Build();
 

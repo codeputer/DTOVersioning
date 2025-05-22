@@ -13,4 +13,3 @@ global using BlazorApp1.Client.Utilities;
 global using BlazorApp1.Client.Utilities.Result.Interfaces;
 global using BlazorApp1.Client.Utilities.Result;
 global using BlazorApp1.Client.Utilities.Result.Payloads;
-global using BlazorApp1.Client.ResourceAccess.Interfaces;

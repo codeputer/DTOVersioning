@@ -3,7 +3,7 @@
 
 <h3>Customers</h3>
 
-@if (string.IsNullOrEmpty(_customerV1) || string.IsNullOrEmpty(_customerV2))
+@if (RendererInfo.IsInteractive == false)
 {
   <p><em>Loading...</em></p>
   return;
@@ -12,22 +12,23 @@
 <div style="display: flex; flex-direction: column; gap: 1.5em;">
     <JSONResult Label="Customer V1"
                 ButtonLabel="Deserialize V1"
-                CustomerJson="@_customerV1"
+                CustomerJson="@_customerJSONV1"
                 DeserializationResult="@_customerV1Result"
                 OnButtonClick="OnDeserializeCustomerV1"
                 TextAreaId="customerV1" />
     <JSONResult Label="Customer V2"
                 ButtonLabel="Deserialize V2"
-                CustomerJson="@_customerV2"
+                CustomerJson="@_customerJSONV2"
                 DeserializationResult="@_customerV2Result"
                 OnButtonClick="OnDeserializeCustomerV2"
                 TextAreaId="customerV2" />
-  <JSONResult Label="Customer V3"
-              ButtonLabel="Deserialize v3"
-              CustomerJson="@_customerV3"
-              DeserializationResult="@_customerV3Result"
-              OnButtonClick="OnDeserializeCustomerV3"
-              TextAreaId="customerV3" />
+
+    <JSONResult Label="Customer V3"
+                ButtonLabel="Deserialize v3"
+                CustomerJson="@_customerJSONV3"
+                DeserializationResult="@_customerV3Result"
+                OnButtonClick="OnDeserializeCustomerV3"
+                TextAreaId="customerV3" />
 </div>
 
 

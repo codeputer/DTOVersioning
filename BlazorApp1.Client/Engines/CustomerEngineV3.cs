@@ -1,13 +1,16 @@
 ﻿namespace BlazorApp1.Client.Engines;
 
-public class CustomerEngineV3(CustomerRA customerRA) : ICustomerEngine
+public class CustomerEngineV3(CustomerEngine customerRA) : ICustomerEngine
 {
-  private readonly CustomerRA _CustomerRA = customerRA ?? throw new ArgumentNullException(nameof(customerRA));
+  private readonly CustomerEngine _CustomerRA = customerRA ?? throw new ArgumentNullException(nameof(customerRA));
 
   public Type CustomerType => typeof(CustomerV3);
 
-  public Result<IEnumerable<ICustomerDTO>> GetCustomer(string id)
+  public ICustomerDTO? GetCustomer(string id)
   {
+    if (string.IsNullOrWhiteSpace(id))
+      throw new ArgumentNullException(nameof(id), "Id cannot be null or empty");
+
     return _CustomerRA.GetCustomer<CustomerV3>(id);
   }
 }
