@@ -24,7 +24,7 @@ public class Result<TReturn, TResultPayload>
   /// Success is a ResultStatus==true, and the ResultValue is not null
   /// </summary>
   [JsonIgnore]
-  public bool IsSuccessful => ResultStatus == true && PayloadWrapper is not null;
+  public bool IsSuccessful => ResultStatus == true && PayloadWrapper is not null && PayloadWrapper is not null;
 
   /// <summary>
   /// Failed is a ResultStatus==false, and the ResultValue may be null - check Messages or Exceptions for more information

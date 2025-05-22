@@ -1,3 +1,5 @@
+using BlazorApp1.Client.Models;
+
 namespace BlazorApp1.Client.Pages;
 
 public partial class Customers : ComponentBase
@@ -6,9 +8,9 @@ public partial class Customers : ComponentBase
   [Inject]
   private CustomerManager CustomerManager { get; set; } = default!;
 
-  private ICustomerDTO? _customerV1;
-  private ICustomerDTO? _customerV2;
-  private ICustomerDTO? _customerV3;
+  private ICustomerDTO? _customerDTOV1;
+  private ICustomerDTO? _customerDTOV2;
+  private ICustomerDTO? _customerDTOV3;
 
   private string? _customerJSONV1;
   private string? _customerJSONV2;
@@ -17,6 +19,10 @@ public partial class Customers : ComponentBase
   private string? _customerV1Result;
   private string? _customerV2Result;
   private string? _customerV3Result;
+
+  Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>>? _ResultPayloadV1;
+  Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>>? _ResultPayloadV2;
+  Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>>? _ResultPayloadV3;
 
   private readonly JsonSerializerOptions _JsonSerializeOptions = new()
   {
@@ -31,47 +37,51 @@ public partial class Customers : ComponentBase
     if (RendererInfo.IsInteractive)
     {
       await Task.Delay(1000); // Simulate async work
-      _customerV1 = CustomerManager.GetCustomer<CustomerV1>("1");
-      _customerV2 = CustomerManager.GetCustomer<CustomerV2>("2");
-      _customerV3 = CustomerManager.GetCustomer<CustomerV3>("3");
-      _customerJSONV1 = JsonSerializer.Serialize(_customerV1, _JsonSerializeOptions);
-      _customerJSONV2 = JsonSerializer.Serialize(_customerV2, _JsonSerializeOptions);
-      _customerJSONV3 = JsonSerializer.Serialize(_customerV3, _JsonSerializeOptions);
+      _customerDTOV1 = CustomerManager.GetCustomer<CustomerV1>("1");
+      _customerDTOV2 = CustomerManager.GetCustomer<CustomerV2>("2");
+      _customerDTOV3 = CustomerManager.GetCustomer<CustomerV3>("3");
+
+      //wrap the ICustoemrDTO in a ResultPayloadOfType<T> object
+      var _CustomerV1Wrapped = ResultPayloadOfType<CustomerV1>.CreateInstance(_customerDTOV1 as CustomerV1);
+      var _CustomerV2Wrapped = ResultPayloadOfType<CustomerV2>.CreateInstance(_customerDTOV1 as CustomerV2);
+      var _CustomerV3Wrapped = ResultPayloadOfType<CustomerV3>.CreateInstance(_customerDTOV1 as CustomerV3);
+
+      Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>> _ResultPayloadV1 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>>.Success(_CustomerV1Wrapped!);
+      Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>> _ResultPayloadV2 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>>.Success(_CustomerV2Wrapped!);
+      Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>> _ResultPayloadV3 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>>.Success(_CustomerV3Wrapped!);
+
+      _customerJSONV1 = _ResultPayloadV1.ResultJson;
+      _customerJSONV2 = _ResultPayloadV2.ResultJson;
+      _customerJSONV3 = _ResultPayloadV3.ResultJson;
 
     }
     base.OnInitialized();
   }
-  
+
   private void OnDeserializeCustomerV1()
   {
-    CustomerV1? customerV1Result = null; // ResultExtensions.DeserializeResult<List<CustomerV1>>(_customerV1!, typeof(IEnumerable<CustomerV2>));
-    //try
-    
-    //  customerV1Result = JsonSerializer.Deserialize<ICustomerDTO>(_customerV1, _JsonSerializeOptions);
-    //  if (customerV1Result is null)
-    //    if (customerV1Result is null)
-    //    {
-    //      _customerV1Result = "Deserialization returned null.";
-    //      return;
-    //    }
+    try
+    {
+      if (string.IsNullOrWhiteSpace(_customerV1Result) == false)
+      {
+        _customerV1Result = "Deserialization returned null.";
+        return;
+      }
 
-    //  var listOfCustomerV1 = customerV1Result.ResultValue;
-    //  if (customerV1Result.IsSuccessful)
-    //  {
-    //    if (listOfCustomerV1!.Count > 0)
-    //      _customerV1Result = $"Deserialized: {listOfCustomerV1[0].FirstName} {listOfCustomerV1[0].LastName} ({listOfCustomerV1[0].Email})";
-    //    else
-    //      _customerV1Result = "Deserialization returned no data.";
-    //  }
-    //  else
-    //  {
-    //    _customerV1Result = $"Deserialization failed: {string.Join(", ", customerV1Result.Messages)}";
-    //  }
-    //}
-    //catch (Exception ex)
-    //{
-    //  _customerV1Result = $"Error: {ex.Message}";
-    //}
+      if (_ResultPayloadV1!.IsSuccessful)
+      {
+        var customerV1 = _ResultPayloadV1!.PayloadWrapper!.Payload;
+        _customerV1Result = $"Deserialized: {customerV1.FirstName} {customerV1.LastName} ({customerV1.Email})";
+      }
+      else
+      {
+        _customerV1Result = $"Deserialization failed: {string.Join(", ", _ResultPayloadV1.Messages)}";
+      }
+    }
+    catch (Exception ex)
+    {
+      _customerV1Result = $"Error: {ex.Message}";
+    }
   }
 
   private void OnDeserializeCustomerV2()
