@@ -1,4 +1,5 @@
 ﻿
+
 using BlazorApp1.Client.ResourceAccess.Interfaces;
 
 namespace BlazorApp1.Client.ResourceAccess;
@@ -7,10 +8,12 @@ public class CustomerRA_V2(ILogger<CustomerRA_V2> logger) : ICustomerRA<ICustome
 {
   private readonly ILogger<CustomerRA_V2> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-  public string CustomerVersionDTOType => typeof(CustomerV2).FullName!;
+  public string CustomerVersionDTOType { get; private set; }
 
   public ICustomerDTO GetCustomer<TDTOVersion>(string id) where TDTOVersion : ICustomerDTO
   {
+    CustomerVersionDTOType = typeof(TDTOVersion).FullName!;
+
     return new CustomerV2
     {
       Id = id,
@@ -22,8 +25,10 @@ public class CustomerRA_V2(ILogger<CustomerRA_V2> logger) : ICustomerRA<ICustome
     };
   }
 
-  public List<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
+  public IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
   {
+    CustomerVersionDTOType = typeof(IEnumerable<ICustomerDTO>).FullName!;
+
     List<ICustomerDTO> customers = [];
     for (int i = 1; i <= 5; i++)
     {
@@ -31,5 +36,6 @@ public class CustomerRA_V2(ILogger<CustomerRA_V2> logger) : ICustomerRA<ICustome
     }
     return customers;
   }
+
 }
 

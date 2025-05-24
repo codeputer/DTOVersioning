@@ -15,7 +15,7 @@ public interface ICustomerRA<TReturnDTOVersion> where TReturnDTOVersion : ICusto
   /// Gets the customers of type T.
   /// </summary>
   /// <returns>The list of customers of type T.</returns>
-   List<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO;
+   IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO;
 }
 
 

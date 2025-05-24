@@ -1,14 +1,17 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace BlazorApp1.Client.ResourceAccess;
 
 public class CustomerRA_V1(ILogger<CustomerRA_V1> logger) : ICustomerRA<ICustomerDTO>
 {
   private readonly ILogger<CustomerRA_V1> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-  public string CustomerVersionDTOType => typeof(CustomerV1).FullName!;
+  public string CustomerVersionDTOType { get; private set; }
 
   public ICustomerDTO GetCustomer<TDTOVersion>(string id) where TDTOVersion : ICustomerDTO
   {
+    CustomerVersionDTOType = typeof(TDTOVersion).FullName!;
     return new CustomerV1
     {
       Id = id,
@@ -18,8 +21,10 @@ public class CustomerRA_V1(ILogger<CustomerRA_V1> logger) : ICustomerRA<ICustome
     };
   }
 
-  public List<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
+  public IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
   {
+    CustomerVersionDTOType = typeof(IEnumerable<ICustomerDTO>).FullName!;
+
     List<ICustomerDTO> customers = new();
     for (int i = 1; i <= 5; i++)
     {

@@ -1,5 +1,31 @@
 ﻿namespace BlazorApp1.Client.Utilities.Result;
 
+/// <summary>
+/// The Result class is a generic utility designed to standardize the way method call outcomes are represented and handled throughout the application.
+/// 
+/// It encapsulates:
+/// - Operation Status: Indicates if an operation was successful or failed (ResultStatus, IsSuccessful, Failed).
+/// - Payload: Holds the result value or data from the operation (PayloadWrapper).
+/// - Error Handling: Collects error messages and exceptions that occurred during the operation (Messages, Exceptions).
+/// - Serialization Support: Provides mechanisms to serialize and deserialize the result and its payload for transport or storage (ResultJson).
+/// - Type Information: Stores the full type name of the result for polymorphic scenarios (FullTypeName).
+/// - Factory Methods: Supplies static methods to easily create success or failure results, supporting consistent error and result handling patterns.
+/// 
+/// <para>
+/// The class uses two generic type parameters:
+/// <list type="bullet">
+/// <item><b>TReturn</b>: The logical or expected type of the result (e.g., a DTO or domain object) that consumers expect to work with.</item>
+/// <item><b>TResultPayload</b>: The actual payload wrapper type, which must implement IResultPayload&lt;TReturn&gt;. This allows for additional metadata, structure, or polymorphic handling around the core result value.</item>
+/// </list>
+/// This dual-generic approach allows the Result class to be flexible and type-safe, supporting scenarios where the payload may need to wrap, extend, or add metadata to the core result type. 
+/// It enables advanced patterns such as versioning, polymorphic deserialization, or result decoration, while still enforcing that the payload is compatible with the expected result type.
+/// </para>
+/// <para>
+/// <b>Example:</b> TReturn could be ICustomerDTO, and TResultPayload could be ResultPayloadOfType&lt;CustomerV1&gt;, allowing the result to carry both the expected interface and a strongly-typed payload with extra context.
+/// </para>
+/// 
+/// This class helps enforce a consistent, robust, and testable approach to error handling, result reporting, and data transport across the Blazor application.
+/// </summary>
 public class Result<TReturn, TResultPayload> 
   where TResultPayload :  IResultPayload<TReturn>
 {

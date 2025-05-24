@@ -25,7 +25,7 @@ public class CustomerEngine(IEnumerable<ICustomerRA<ICustomerDTO>> customerRAs, 
     return  raRequired.GetCustomer<TDTOVersion>(id);
   }
 
-  public List<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
+  public IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
   {
      var versionOfDTO = typeof(TDTOVersion);
     var raRequired = _customerRAs.FirstOrDefault(pCustomerRA => pCustomerRA.CustomerVersionDTOType == versionOfDTO.FullName);
