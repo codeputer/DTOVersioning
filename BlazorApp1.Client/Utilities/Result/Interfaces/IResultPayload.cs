@@ -9,4 +9,5 @@ public interface IResultPayload<out T>
   /// Must store exactly one payload of type T.
   /// </summary>
   T Payload { get; }
+
 }

@@ -6,29 +6,44 @@ public class CustomerRA_V1(ILogger<CustomerRA_V1> logger) : ICustomerRA<ICustome
 
   public string CustomerVersionDTOType { get; private set; } = typeof(CustomerV1).FullName!;
 
-  public ICustomerDTO GetCustomer(string id)
+  public Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> GetCustomer(string id)
   {
     CustomerVersionDTOType = typeof(CustomerV1).FullName!;
 
-    return new CustomerV1
+    var customerV1 =  new CustomerV1
     {
       Id = id,
       FirstName = $"John_{id}",
       LastName = "Doe",
       Email = $"John_{id}@example.com"
     };
+
+    var payload = ResultPayloadOfType<ICustomerDTO>.CreateInstance(customerV1);
+
+    return Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>>.Success(payload);
+
   }
 
-  public IEnumerable<ICustomerDTO> GetCustomers()
+  public Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>> GetCustomers()
   {
     CustomerVersionDTOType = typeof(IEnumerable<CustomerV1>).FullName!;
 
-    List<ICustomerDTO> customers = new List<ICustomerDTO>();
+    List<ICustomerDTO> customers = [];
     for (int i = 1; i <= 5; i++)
     {
-      customers.Add(GetCustomer(i.ToString()));
+      var result = GetCustomer(i.ToString());
+
+      if (result.IsSuccessful)
+        customers.Add(result!.PayloadWrapper!.Payload);
+      else
+      {
+         return Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>>.Failure(result.Messages);
+      }
     }
-    return customers;
+
+    var payload = ResultEnumerablePayload<ICustomerDTO>.CreateInstance(customers);
+
+    return Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>>.Success(payload);
   }
 }
 

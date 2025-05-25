@@ -26,8 +26,8 @@
 /// 
 /// This class helps enforce a consistent, robust, and testable approach to error handling, result reporting, and data transport across the Blazor application.
 /// </summary>
-public class Result<TReturn, TResultPayload> 
-  where TResultPayload :  IResultPayload<TReturn>
+public class Result<TReturn, TResultPayload>
+  where TResultPayload : IResultPayload<TReturn>
 {
   // This class is used to return a result from a method call, and it contains the following properties:
   // - ResultStatus: a boolean value that indicates if the operation was successful or not
@@ -64,31 +64,45 @@ public class Result<TReturn, TResultPayload>
   [JsonIgnore]
   public TResultPayload? PayloadWrapper { get; private set; }
 
-  string? resultJson;
   [JsonPropertyName(nameof(ResultJson))]
-  public string? ResultJson
-  {  
-    get
+  public string? ResultJson { get; private set; }
+
+
+  public string? Serialize()
+  {
+    if (this.IsSuccessful)
     {
-      resultJson = PayloadWrapper is null ? null : JsonSerializer.Serialize(PayloadWrapper);
-      return resultJson;  
+      this.ResultJson = JsonSerializer.Serialize(this.PayloadWrapper!.Payload);
     }
-    set
+    else
     {
-      if (value is not null)
-      {
-        try
-        {
-          PayloadWrapper = JsonSerializer.Deserialize<TResultPayload>(value);
-        }
-        catch (JsonException ex)
-        {
-          Exceptions.Add(ex);
-          Messages.Add($"Error de-serializing ResultJson: {ex.Message}");
-        }
-      }
+      this.ResultJson = JsonSerializer.Serialize(this.Messages);
+    }
+
+    return this.ResultJson;
+  }
+
+  public void Deserialize()
+  {
+
+    if (string.IsNullOrWhiteSpace(this.ResultJson))
+    {
+      Messages.Add("ResultJson is null or empty, cannot deserialize.");
+      this.ResultJson = string.Join("|", Messages);
+      return;
+    }
+
+    try
+    {
+      PayloadWrapper = JsonSerializer.Deserialize<TResultPayload>(this.ResultJson);
+    }
+    catch (JsonException ex)
+    {
+      Exceptions.Add(ex);
+      Messages.Add($"Error de-serializing ResultJson: {ex.Message}");
     }
   }
+
 
   [JsonPropertyName(nameof(Messages))]
   public List<string> Messages { get; set; } = []; //must have setter for deserialization
@@ -178,7 +192,7 @@ public class Result<TReturn, TResultPayload>
     }
 #endif
   }
-  
+
 
   #region StaticFactoryMethods
   ///// <summary>

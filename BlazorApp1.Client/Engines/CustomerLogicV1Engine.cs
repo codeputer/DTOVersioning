@@ -7,7 +7,7 @@ public class CustomerLogicV1Engine(IEnumerable<ICustomerRA<ICustomerDTO>> custom
 
   public Type CustomerType => typeof(CustomerV1);
 
-  public Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> UpdateCustomer(ICustomerDTO newCustomerIN)
+  public Result<bool, ResultBoolPayload> UpdateCustomer(ICustomerDTO newCustomerIN)
   {
     var _customerRA = _customerRAs.FirstOrDefault(pCustomerRA=> pCustomerRA.CustomerVersionDTOType == CustomerType.Name)
       ?? throw new InvalidOperationException($"No customer RA found for type {CustomerType.Name}");
@@ -17,11 +17,13 @@ public class CustomerLogicV1Engine(IEnumerable<ICustomerRA<ICustomerDTO>> custom
     {
       var msg = $"Invalid customer type provided for update: {newCustomerIN.GetType().FullName}";
       _logger.LogError(msg);
-      return Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>>.Failure(msg);
+      return Result<bool, ResultBoolPayload>.Failure(msg);
     }
 
-    var payload = ResultPayloadOfType<ICustomerDTO>.CreateInstance(newCustomer);
+    var payload = ResultBoolPayload.CreateInstance(true) as ResultBoolPayload;
 
-    return Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>>.Success(payload);
+    return Result<bool, ResultBoolPayload>.Success(payload!);
   }
+
+  
 }

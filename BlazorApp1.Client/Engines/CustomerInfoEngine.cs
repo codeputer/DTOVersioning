@@ -1,4 +1,6 @@
-﻿namespace BlazorApp1.Client.Engines;
+﻿using System.Net.WebSockets;
+
+namespace BlazorApp1.Client.Engines;
 
 public class CustomerInfoEngine(IEnumerable<ICustomerRA<ICustomerDTO>> customerRAs, ILogger<CustomerInfoEngine> logger) 
 {
@@ -7,7 +9,7 @@ public class CustomerInfoEngine(IEnumerable<ICustomerRA<ICustomerDTO>> customerR
 
   public string CustomerVersionDTOType => typeof(CustomerInfoEngine).FullName!;
 
-  public ICustomerDTO GetCustomer<TDTOVersion>(string id) where TDTOVersion : ICustomerDTO
+  public Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> GetCustomer<TDTOVersion>(string id) where TDTOVersion : class , ICustomerDTO
   {
     if (string.IsNullOrWhiteSpace(id))
       throw new ArgumentNullException(nameof(id), "Id cannot be null or empty");
@@ -20,12 +22,21 @@ public class CustomerInfoEngine(IEnumerable<ICustomerRA<ICustomerDTO>> customerR
       throw new InvalidOperationException($"No customer resource access found for {versionOfDTO.FullName}");
     }
 
-    return raRequired.GetCustomer(id);
+    var result = raRequired.GetCustomer(id);
+
+    if (result.Failed)
+    {
+      _logger.LogError(string.Join("|", result.Messages));
+      return Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>>.Failure(result.Messages);
+    }
+
+    return result;
   }
 
-  public IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
+  public Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>> GetCustomers<TDTOVersion>()
+    where TDTOVersion : ICustomerDTO
   {
-     var versionOfDTO = typeof(TDTOVersion);
+    var versionOfDTO = typeof(TDTOVersion);
     var raRequired = _customerRAs.FirstOrDefault(pCustomerRA => pCustomerRA.CustomerVersionDTOType == versionOfDTO.FullName);
     if (raRequired == null)
     {
@@ -33,7 +44,13 @@ public class CustomerInfoEngine(IEnumerable<ICustomerRA<ICustomerDTO>> customerR
       throw new InvalidOperationException($"No customer resource access found for {versionOfDTO.FullName}");
     }
 
-    return raRequired.GetCustomers();
+    var result = raRequired.GetCustomers();
+    if (result.Failed) {  
+      _logger.LogError(string.Join("|", result.Messages));
+      return Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>>.Failure(result.Messages);
+    }
+
+    return result;
 
   }
 }

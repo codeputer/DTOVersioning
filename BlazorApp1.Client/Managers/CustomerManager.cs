@@ -14,23 +14,31 @@ public class CustomerManager(CustomerInfoEngine customerEngine, ILogger<Customer
   /// <param name="id"></param>
   /// <returns></returns>
   /// <exception cref="InvalidOperationException"></exception>
-  public ICustomerDTO? GetCustomer<TCustomerVersion>(string id) where TCustomerVersion : class, ICustomerDTO, new()
+  public Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> GetCustomer<TCustomerVersion>(string id) where TCustomerVersion : class, ICustomerDTO, new()
   {
 
 #if DEBUG
     var typeName = typeof(TCustomerVersion).FullName ?? string.Empty;
 #endif
 
-    var customerVersionDTO = customerEngine.GetCustomer<TCustomerVersion>(id) ?? throw new InvalidOperationException($"Customer not found for id {id}");
+    var result = customerEngine.GetCustomer<TCustomerVersion>(id) ?? throw new InvalidOperationException($"Customer not found for id {id}");
+    if (result.Failed)
+    {
+      _logger.LogError(string.Join("|", result.Messages));
+    } 
 
-    return customerVersionDTO;
+    return result;
 
   }
 
-  public IEnumerable<ICustomerDTO>? GetCustomers<TCustomerVersion>() where TCustomerVersion : class, ICustomerDTO, new()
+  public Result<IEnumerable<ICustomerDTO>,ResultEnumerablePayload<ICustomerDTO>> GetCustomers<TCustomerVersion>() 
+    where TCustomerVersion : class, ICustomerDTO, new()
   {
-
     var customersDTO = customerEngine.GetCustomers<TCustomerVersion>() ?? throw new InvalidOperationException($"No customers found for version {typeof(TCustomerVersion).FullName}");
+    if (customersDTO.Failed)
+    {
+      _logger.LogError(string.Join("|", customersDTO.Messages));
+    } 
 
     return customersDTO;
   }

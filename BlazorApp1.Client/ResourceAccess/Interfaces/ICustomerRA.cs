@@ -9,12 +9,12 @@ public interface ICustomerRA<TReturnDTOVersion> where TReturnDTOVersion : ICusto
   /// </summary>
   /// <param name="id">The customer id.</param>
   /// <returns>The customer of type T.</returns>
-  public ICustomerDTO GetCustomer(string id);
+  Result<ICustomerDTO,ResultPayloadOfType<ICustomerDTO>> GetCustomer(string id);
 
   /// <summary>
   /// Gets the customers of type T.
   /// </summary>
   /// <returns>The list of customers of type T.</returns>
-   IEnumerable<ICustomerDTO> GetCustomers();
+  Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>> GetCustomers();
 }
 

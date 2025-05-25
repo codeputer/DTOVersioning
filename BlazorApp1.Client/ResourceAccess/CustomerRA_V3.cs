@@ -1,5 +1,4 @@
-﻿
-namespace BlazorApp1.Client.ResourceAccess;
+﻿namespace BlazorApp1.Client.ResourceAccess;
 
 public class CustomerRA_V3(ILogger<CustomerRA_V3> logger) : ICustomerRA<ICustomerDTO>
 {
@@ -7,32 +6,39 @@ public class CustomerRA_V3(ILogger<CustomerRA_V3> logger) : ICustomerRA<ICustome
 
   public string CustomerVersionDTOType { get; private set; } = typeof(CustomerV3).FullName!;
 
-  public ICustomerDTO GetCustomer(string id)
+  public Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> GetCustomer(string id)
   {
     CustomerVersionDTOType = typeof(CustomerV3).FullName!;
 
-    return new CustomerV3
-    {
-      Id = id,
-      FirstName = $"John_{id}",
-      LastName = "Doe",
-      Email = $"John_{id}@example.com",
-      Address = $"123 Main St_{id}",
-      Citizen = "Canadian"
-    };
+    // Simulating a scenario where the customer is not found
+
+    var msg = $"CustomerRA_V3 with ID:{id} FAILED.";
+
+    return Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>>.Failure(msg);
+
   }
 
-  public IEnumerable<ICustomerDTO> GetCustomers() 
+  public Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>> GetCustomers()
   {
-    CustomerVersionDTOType = typeof(IEnumerable<ICustomerDTO>).FullName!;
+    CustomerVersionDTOType = typeof(IEnumerable<CustomerV3>).FullName!;
 
     List<ICustomerDTO> customers = [];
     for (int i = 1; i <= 5; i++)
     {
-      customers.Add(GetCustomer(i.ToString()));
-    }
-    return customers;
-  }
+      var result = GetCustomer(i.ToString());
 
+      if (result.IsSuccessful)
+        customers.Add(result!.PayloadWrapper!.Payload);
+      else
+      {
+        return Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>>.Failure(result.Messages);
+      }
+    }
+
+    var payload = ResultEnumerablePayload<ICustomerDTO>.CreateInstance(customers);
+
+    return Result<IEnumerable<ICustomerDTO>, ResultEnumerablePayload<ICustomerDTO>>.Success(payload);
+  }
 }
+
 

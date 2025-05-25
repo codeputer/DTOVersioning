@@ -1,5 +1,3 @@
-using BlazorApp1.Client.Models;
-
 namespace BlazorApp1.Client.Pages;
 
 public partial class Customers : ComponentBase
@@ -8,21 +6,18 @@ public partial class Customers : ComponentBase
   [Inject]
   private CustomerManager CustomerManager { get; set; } = default!;
 
-  private ICustomerDTO? _customerDTOV1;
-  private ICustomerDTO? _customerDTOV2;
-  private ICustomerDTO? _customerDTOV3;
-
   private string? _customerJSONV1;
   private string? _customerJSONV2;
   private string? _customerJSONV3;
 
-  private string? _customerV1Result;
-  private string? _customerV2Result;
-  private string? _customerV3Result;
+  private string? _customerV1Deserialized;
+  private string? _customerV2Deserialized;
+  private string? _customerV3Deserialized;
 
-  Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>>? _ResultPayloadV1;
-  Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>>? _ResultPayloadV2;
-  Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>>? _ResultPayloadV3;
+  Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> resultV1 = default!;
+  Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> resultV2 = default!;
+  Result<ICustomerDTO, ResultPayloadOfType<ICustomerDTO>> resultV3 = default!;
+
 
   private readonly JsonSerializerOptions _JsonSerializeOptions = new()
   {
@@ -37,22 +32,17 @@ public partial class Customers : ComponentBase
     if (RendererInfo.IsInteractive)
     {
       await Task.Delay(1000); // Simulate async work
-      _customerDTOV1 = CustomerManager.GetCustomer<CustomerV1>("1");
-      _customerDTOV2 = CustomerManager.GetCustomer<CustomerV2>("2");
-      _customerDTOV3 = CustomerManager.GetCustomer<CustomerV3>("3");
+      resultV1 = CustomerManager.GetCustomer<CustomerV1>("1");
+      resultV2 = CustomerManager.GetCustomer<CustomerV2>("2");
+      resultV3 = CustomerManager.GetCustomer<CustomerV3>("3");
 
-      //wrap the ICustoemrDTO in a ResultPayloadOfType<T> object
-      var _CustomerV1Wrapped = ResultPayloadOfType<CustomerV1>.CreateInstance(_customerDTOV1 as CustomerV1);
-      var _CustomerV2Wrapped = ResultPayloadOfType<CustomerV2>.CreateInstance(_customerDTOV1 as CustomerV2);
-      var _CustomerV3Wrapped = ResultPayloadOfType<CustomerV3>.CreateInstance(_customerDTOV1 as CustomerV3);
+      resultV1.Serialize();
+      resultV2.Serialize();
+      resultV3.Serialize();
 
-      Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>> _ResultPayloadV1 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV1>>.Success(_CustomerV1Wrapped!);
-      Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>> _ResultPayloadV2 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV2>>.Success(_CustomerV2Wrapped!);
-      Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>> _ResultPayloadV3 = Result<ICustomerDTO, ResultPayloadOfType<CustomerV3>>.Success(_CustomerV3Wrapped!);
-
-      _customerJSONV1 = _ResultPayloadV1.ResultJson;
-      _customerJSONV2 = _ResultPayloadV2.ResultJson;
-      _customerJSONV3 = _ResultPayloadV3.ResultJson;
+      _customerJSONV1 = resultV1.ResultJson;
+      _customerJSONV2 = resultV2.ResultJson;
+      _customerJSONV3 = resultV3.ResultJson;
 
     }
     base.OnInitialized();
@@ -62,88 +52,106 @@ public partial class Customers : ComponentBase
   {
     try
     {
-      if (string.IsNullOrWhiteSpace(_customerV1Result) == false)
+      if (string.IsNullOrWhiteSpace(_customerJSONV1))
       {
-        _customerV1Result = "Deserialization returned null.";
+        _customerJSONV1 = "Deserialization returned null.";
         return;
       }
 
-      if (_ResultPayloadV1!.IsSuccessful)
+      if (resultV1!.IsSuccessful)
       {
-        var customerV1 = _ResultPayloadV1!.PayloadWrapper!.Payload;
-        _customerV1Result = $"Deserialized: {customerV1.FirstName} {customerV1.LastName} ({customerV1.Email})";
+        Type fulltype = Type.GetType(resultV1.FullTypeName!)
+                              ?? throw new InvalidOperationException($"Type {resultV1.FullTypeName} not found.");
+
+        var customerV1 = JsonSerializer.Deserialize(_customerJSONV1, fulltype) as CustomerV1;
+
+        if (customerV1 is not null)
+        {
+          _customerV1Deserialized = $"Deserialized: {customerV1.FirstName} {customerV1.LastName} ({customerV1.Email})";
+        }
+        else
+        {
+          _customerV1Deserialized = "Deserialization returned an unexpected type.";
+        }
       }
-      else
-      {
-        _customerV1Result = $"Deserialization failed: {string.Join(", ", _ResultPayloadV1.Messages)}";
-      }
+
     }
     catch (Exception ex)
     {
-      _customerV1Result = $"Error: {ex.Message}";
+      _customerV1Deserialized = $"Error: {ex.Message}";
+    }
+  }
+  private void OnDeserializeCustomerV2()
+  {
+    try
+    {
+      if (string.IsNullOrWhiteSpace(_customerJSONV2))
+      {
+        _customerJSONV2 = "Deserialization returned null.";
+        return;
+      }
+
+      if (resultV2!.IsSuccessful)
+      {
+        Type fulltype = Type.GetType(resultV1.FullTypeName!)
+                              ?? throw new InvalidOperationException($"Type {resultV1.FullTypeName} not found.");
+
+        var customerV2 = JsonSerializer.Deserialize(_customerJSONV2, fulltype) as CustomerV2;
+
+        if (customerV2 is not null)
+        {
+          _customerV2Deserialized = $"Deserialized: {customerV2.FirstName} {customerV2.LastName} ({customerV2.Email} Citizen:{customerV2.Citizen})";
+        }
+        else
+        {
+          _customerV2Deserialized = "Deserialization returned an unexpected type.";
+        }
+      }
+
+    }
+    catch (Exception ex)
+    {
+      _customerV1Deserialized = $"Error: {ex.Message}";
     }
   }
 
-  private void OnDeserializeCustomerV2()
-  {
-
-    //CustomerEngineV2? customerV2Result = null;
-    //try
-    //{
-    //  var customerV1Result = JsonSerializer.Deserialize<Result<List<CustomerV2>>>(_customerV2 ?? "", _JsonSerializeOptions);
-    //  if (customerV2Result is null)
-    //  {
-    //    _customerV2Result = "Deserialization returned null.";
-    //    return;
-    //  }
-
-    //  var listOfCustomerV2 = customerV2Result.ResultValue;
-    //  if (customerV2Result.IsSuccessful)
-    //  {
-    //    if (listOfCustomerV2!.Count > 0)
-    //      _customerV2Result = $"Deserialized: {listOfCustomerV2[0].FirstName} {listOfCustomerV2[0].LastName} ({listOfCustomerV2[0].Email})";
-    //    else
-    //      _customerV2Result = "Deserialization returned no data.";
-    //  }
-    //  else
-    //  {
-    //    _customerV2Result = $"Deserialization failed: {string.Join(", ", customerV2Result.Messages)}";
-    //  }
-    //}
-    //catch (Exception ex)
-    //{
-    //  _customerV2Result = $"Error: {ex.Message}";
-    //}
-  }
   private void OnDeserializeCustomerV3()
   {
-    //CustomerV3 customerV3 = null;
-    //try
-    //{
-    //  var customerV3Result = JsonSerializer.Deserialize<Result<List<CustomerV3>>>(_customerV3 ?? "", _JsonSerializeOptions);
-    //  if (customerV3Result is null)
-    //  {
-    //    _customerV3Result = "Deserialization returned null.";
-    //    return;
-    //  }
+    try
+    {
+      if (string.IsNullOrWhiteSpace(_customerJSONV3))
+      {
+        _customerJSONV3 = "Deserialization returned null.";
+        return;
+      }
 
-    //  var listOfCustomerV3 = customerV3Result.ResultValue;
-    //  if (customerV3Result.IsSuccessful)
-    //  {
-    //    if (listOfCustomerV3!.Count > 0)
-    //      _customerV3Result = $"Deserialized: {listOfCustomerV3[0].FirstName} {listOfCustomerV3[0].LastName} ({listOfCustomerV3[0].Email})";
-    //    else
-    //      _customerV3Result = "Deserialization returned no data.";
-    //  }
-    //  else
-    //  {
-    //    _customerV3Result = $"Deserialization failed: {string.Join(", ", customerV3Result.Messages)}";
-    //  }
-    //}
-    //catch (Exception ex)
-    //{
-    //  _customerV3Result = $"Error: {ex.Message}";
-    //}
+      if (resultV3!.IsSuccessful)
+      {
+        Type fulltype = Type.GetType(resultV3.FullTypeName!)
+                              ?? throw new InvalidOperationException($"Type {resultV1.FullTypeName} not found.");
+
+        var customerV3 = JsonSerializer.Deserialize(_customerJSONV3, fulltype) as CustomerV3;
+
+        if (customerV3 is not null)
+        {
+          _customerV3Deserialized = $"Deserialized: {customerV3.FirstName} {customerV3.LastName} ({customerV3.Email} Heritage:{customerV3.Heritage})";
+        }
+        else
+        {
+          _customerV3Deserialized = "Deserialization returned an unexpected type.";
+        }
+      }
+      else
+      {
+        _customerV3Deserialized = "Deserialization failed: " + string.Join(", ", resultV3.Messages);
+      }
+
+    }
+    catch (Exception ex)
+    {
+      _customerV3Deserialized = $"Error: {ex.Message}";
+    }
   }
+
 }
 
