@@ -13,3 +13,4 @@ global using BlazorApp1.Client.Utilities;
 global using BlazorApp1.Client.Utilities.Result.Interfaces;
 global using BlazorApp1.Client.Utilities.Result;
 global using BlazorApp1.Client.Utilities.Result.Payloads;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

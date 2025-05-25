@@ -1,17 +1,15 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-
-namespace BlazorApp1.Client.ResourceAccess;
+﻿namespace BlazorApp1.Client.ResourceAccess;
 
 public class CustomerRA_V1(ILogger<CustomerRA_V1> logger) : ICustomerRA<ICustomerDTO>
 {
   private readonly ILogger<CustomerRA_V1> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-  public string CustomerVersionDTOType { get; private set; }
+  public string CustomerVersionDTOType { get; private set; } = typeof(CustomerV1).FullName!;
 
-  public ICustomerDTO GetCustomer<TDTOVersion>(string id) where TDTOVersion : ICustomerDTO
+  public ICustomerDTO GetCustomer(string id)
   {
-    CustomerVersionDTOType = typeof(TDTOVersion).FullName!;
+    CustomerVersionDTOType = typeof(CustomerV1).FullName!;
+
     return new CustomerV1
     {
       Id = id,
@@ -21,14 +19,14 @@ public class CustomerRA_V1(ILogger<CustomerRA_V1> logger) : ICustomerRA<ICustome
     };
   }
 
-  public IEnumerable<ICustomerDTO> GetCustomers<TDTOVersion>() where TDTOVersion : ICustomerDTO
+  public IEnumerable<ICustomerDTO> GetCustomers()
   {
-    CustomerVersionDTOType = typeof(IEnumerable<ICustomerDTO>).FullName!;
+    CustomerVersionDTOType = typeof(IEnumerable<CustomerV1>).FullName!;
 
-    List<ICustomerDTO> customers = new();
+    List<ICustomerDTO> customers = new List<ICustomerDTO>();
     for (int i = 1; i <= 5; i++)
     {
-      customers.Add(GetCustomer<TDTOVersion>(i.ToString()));
+      customers.Add(GetCustomer(i.ToString()));
     }
     return customers;
   }

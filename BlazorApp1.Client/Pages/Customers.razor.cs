@@ -87,7 +87,7 @@ public partial class Customers : ComponentBase
   private void OnDeserializeCustomerV2()
   {
 
-    CustomerEngineV2? customerV2Result = null;
+    //CustomerEngineV2? customerV2Result = null;
     //try
     //{
     //  var customerV1Result = JsonSerializer.Deserialize<Result<List<CustomerV2>>>(_customerV2 ?? "", _JsonSerializeOptions);
@@ -117,7 +117,7 @@ public partial class Customers : ComponentBase
   }
   private void OnDeserializeCustomerV3()
   {
-    CustomerV3 customerV3 = null;
+    //CustomerV3 customerV3 = null;
     //try
     //{
     //  var customerV3Result = JsonSerializer.Deserialize<Result<List<CustomerV3>>>(_customerV3 ?? "", _JsonSerializeOptions);
